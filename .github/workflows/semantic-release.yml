@@ -1,0 +1,64 @@
+name: Semantic Release
+
+on:
+  push:
+    branches:
+      - release/dev
+      - release/prod
+
+jobs:
+  Test:
+    runs-on: ubuntu-latest
+    name: Build, Test, Deploy
+    if: ${{ !startsWith(github.event.head_commit.message, 'chore(release):') }}
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+
+    - name: Use Node.js 16
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16
+
+    - name: Get yarn cache directory path
+      id: yarn-cache-dir-path
+      run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+
+    - name: Restore yarn cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        key: ${{ runner.os }}-yarn-cache-folder-${{ hashFiles('**/yarn.lock', '.yarnrc.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-cache-folder-
+
+    - name: Install deps
+      run: yarn
+
+    - name: Test
+      run: yarn test:ci
+
+    - name: Annotate Eslint Reports
+      uses: ataylorme/eslint-annotate-action@1.2.0
+      if: success() || failure()
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
+        report-json: "reports/eslint.json"
+
+    # - name: Annotate Jest Reports
+    #   uses: dorny/test-reporter@v1
+    #   if: success() || failure()
+    #   with:
+    #     name: JEST Tests
+    #     path: junit.xml
+    #     reporter: jest-junit
+
+    - name: Build
+      run: yarn build
+  
+    - name: Semantic Release
+      env:
+        GITHUB_TOKEN: ${{ secrets.E2GBOT_PAT }}
+        NPM_TOKEN: ${{ secrets.E2GBOT_PAT }}
+      run: yarn semantic-release

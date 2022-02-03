@@ -1,21 +1,29 @@
-import resolve from "@rollup/plugin-node-resolve";
-import commonjs from "@rollup/plugin-commonjs";
-import typescript from "@rollup/plugin-typescript";
-import pkg from "./package.json";
+import commonjs from '@rollup/plugin-commonjs'
+import resolve from '@rollup/plugin-node-resolve'
+import typescript from '@rollup/plugin-typescript'
 
+import pkg from './package.json'
+
+const common = {
+  external: [
+    ...Object.keys(pkg.dependencies || {}),
+    ...Object.keys(pkg.peerDependencies || {})
+  ],
+}
 export default [
   // browser-friendly UMD build
   {
-    input: "src/index.ts",
+    ...common,
+    input: 'src/index.ts',
     output: {
-      name: "E2GDS",
+      name: 'E2GDS',
       file: pkg.browser,
-      format: "umd",
+      format: 'umd',
     },
     plugins: [
       resolve(),
       commonjs(),
-      typescript({ tsconfig: "./tsconfig.json" }),
+      typescript({ tsconfig: './tsconfig.json' }),
     ],
   },
 
@@ -26,11 +34,12 @@ export default [
   // an array for the `output` option, where we can specify
   // `file` and `format` for each target)
   {
-    input: "src/index.ts",
+    ...common,
+    input: 'src/index.ts',
     output: [
-      { file: pkg.main, format: "cjs" },
-      { file: pkg.module, format: "es" },
+      { file: pkg.main, format: 'cjs' },
+      { file: pkg.module, format: 'es' },
     ],
-    plugins: [typescript({ tsconfig: "./tsconfig.json" })],
+    plugins: [typescript({ tsconfig: './tsconfig.json' })],
   },
-];
+]

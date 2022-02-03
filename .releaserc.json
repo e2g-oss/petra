@@ -1,0 +1,30 @@
+{
+  "branches": [
+    "release/prod",
+    {
+      "name": "release/dev",
+      "channel": "dev",
+      "prerelease": "dev"
+    }
+  ],
+  "plugins": [
+    ["@semantic-release/commit-analyzer", {
+      "preset": "conventionalcommits",
+      "parserOpts": {
+        "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES", "BREAKING"]
+      }
+    }],
+    ["@semantic-release/release-notes-generator", {
+      "preset": "conventionalcommits",
+      "parserOpts": {
+        "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES", "BREAKING"]
+      }
+    }],
+    "@semantic-release/github",
+    "@semantic-release/changelog",
+    "@semantic-release/npm",
+    ["@semantic-release/git", {
+      "assets": ["CHANGELOG.md", "package.json"]
+    }]
+  ]
+}
