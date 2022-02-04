@@ -1,7 +1,7 @@
 {
   "name": "@e2g-oss/petra",
   "version": "1.0.0-dev.1",
-  "description": "e2g design tokens",
+  "description": "e2g design system",
   "repository": "git@github.com:e2g-oss/petra.git",
   "author": "Aaron Lampros <alampros@e2g.com>",
   "license": "Artistic-2.0",
